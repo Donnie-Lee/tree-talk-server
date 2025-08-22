@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: treetalk-postgres
+    environment:
+      POSTGRES_DB: treetalk
+      POSTGRES_USER: treetalk
+      POSTGRES_PASSWORD: treetalk123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U treetalk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tree-hole-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: treetalk-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - tree-hole-network
+
+  mongodb:
+    image: mongo:6-jammy
+    container_name: treetalk-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: treetalk
+      MONGO_INITDB_ROOT_PASSWORD: treetalk123
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    networks:
+      - tree-hole-network
+
+  app:
+    build: .
+    container_name: treetalk-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    environment:
+      - DB_USERNAME=treetalk
+      - DB_PASSWORD=treetalk123
+      - MONGODB_URI=mongodb://treetalk:treetalk123@mongodb:27017/treetalk
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=treeTalkSecretKey2024ForJWTTokenGenerationAndValidation
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - tree-hole-network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+
+networks:
+  tree-hole-network:
+    driver: bridge
