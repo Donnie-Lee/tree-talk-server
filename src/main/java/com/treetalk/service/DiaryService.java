@@ -10,6 +10,7 @@ import com.treetalk.repository.EmotionRecordRepository;
 import com.treetalk.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
@@ -33,6 +33,7 @@ public class DiaryService {
         this.emotionRecordRepository = emotionRecordRepository;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public DiaryDto.Response createDiary(Long userId, DiaryDto.CreateRequest request) {
         User user = userRepository.findActiveUserById(userId)
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
@@ -121,6 +122,7 @@ public class DiaryService {
         response.setEncryptedContent(diary.getEncryptedContent());
         response.setRecordDate(diary.getRecordDate());
         
+        // 显式访问延迟加载的关联对象属性，确保在事务中获取数据
         if (diary.getEmotionRecord() != null) {
             EmotionRecordDto.Response emotionResponse = new EmotionRecordDto.Response();
             emotionResponse.setId(diary.getEmotionRecord().getId());
@@ -139,6 +141,7 @@ public class DiaryService {
         response.setId(diary.getId());
         response.setRecordDate(diary.getRecordDate());
         
+        // 显式访问延迟加载的关联对象属性，确保在事务中获取数据
         if (diary.getEmotionRecord() != null) {
             EmotionRecordDto.Response emotionResponse = new EmotionRecordDto.Response();
             emotionResponse.setId(diary.getEmotionRecord().getId());

@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class ChatService {
 
     private final ChatSessionRepository chatSessionRepository;
@@ -35,6 +35,7 @@ public class ChatService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public ChatDto.SessionResponse createSession(Long userId, ChatDto.CreateSessionRequest request) {
         User user = userRepository.findActiveUserById(userId)
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
@@ -130,6 +131,8 @@ public class ChatService {
     private ChatDto.SessionResponse convertToSessionResponse(ChatSession session) {
         ChatDto.SessionResponse response = new ChatDto.SessionResponse();
         response.setId(session.getId());
+        response.setUserId(session.getUser().getId());
+        response.setUserNickname(session.getUser().getNickname());
         response.setAiName(session.getAiName());
         response.setSessionTitle(session.getSessionTitle());
         response.setStartTime(session.getStartTime());

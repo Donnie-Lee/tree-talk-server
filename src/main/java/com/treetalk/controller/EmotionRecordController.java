@@ -28,30 +28,25 @@ public class EmotionRecordController {
 
     @PostMapping("/record")
     @Operation(summary = "创建情绪记录", description = "创建新的情绪记录")
-    public ResponseEntity<ApiResponse<EmotionRecordDto.Response>> createEmotionRecord(
+    public ApiResponse<EmotionRecordDto.Response> createEmotionRecord(
             @Parameter(hidden = true) @RequestAttribute("userId") Long userId,
             @Parameter(description = "情绪记录请求信息", required = true)
             @Valid @RequestBody EmotionRecordDto.CreateRequest request) {
-        try {
-            EmotionRecordDto.Response response = emotionRecordService.createEmotionRecord(userId, request);
-            return ResponseEntity.ok(ApiResponse.success("情绪记录创建成功", response));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(e.getMessage()));
-        }
+        EmotionRecordDto.Response response = emotionRecordService.createEmotionRecord(userId, request);
+        return ApiResponse.success("情绪记录创建成功", response);
     }
 
     @GetMapping("/today")
     @Operation(summary = "获取今日情绪记录", description = "获取用户今日的情绪记录")
-    public ResponseEntity<ApiResponse<EmotionRecordDto.Response>> getTodayEmotionRecord(
+    public ApiResponse<EmotionRecordDto.Response> getTodayEmotionRecord(
             @Parameter(hidden = true) @RequestAttribute("userId") Long userId) {
         EmotionRecordDto.Response response = emotionRecordService.getTodayEmotionRecord(userId);
-        return ResponseEntity.ok(ApiResponse.success("获取今日情绪记录成功", response));
+        return ApiResponse.success("获取今日情绪记录成功", response);
     }
 
     @GetMapping("/records")
     @Operation(summary = "按日期范围获取情绪记录", description = "根据指定日期范围获取情绪记录列表")
-    public ResponseEntity<ApiResponse<List<EmotionRecordDto.Response>>> getEmotionRecordsByDateRange(
+    public ApiResponse<List<EmotionRecordDto.Response>> getEmotionRecordsByDateRange(
             @Parameter(hidden = true) @RequestAttribute("userId") Long userId,
             @Parameter(description = "开始日期 (YYYY-MM-DD)", required = true, example = "2024-01-01") 
             @RequestParam("startDate") LocalDate startDate,
@@ -59,6 +54,6 @@ public class EmotionRecordController {
             @RequestParam("endDate") LocalDate endDate) {
         List<EmotionRecordDto.Response> responses = emotionRecordService
                 .getEmotionRecordsByDateRange(userId, startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success("获取情绪记录列表成功", responses));
+        return ApiResponse.success("获取情绪记录列表成功", responses);
     }
 }

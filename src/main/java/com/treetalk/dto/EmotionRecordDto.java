@@ -16,7 +16,7 @@ public class EmotionRecordDto {
         private Integer emotionType;
 
         @NotNull(message = "情绪值不能为空")
-        @Min(value = 1, message = "情绪值必须在1-5之间")
+        @Min(value = -5, message = "情绪值必须在1-5之间")
         @Max(value = 5, message = "情绪值必须在1-5之间")
         private Integer emotionValue;
 

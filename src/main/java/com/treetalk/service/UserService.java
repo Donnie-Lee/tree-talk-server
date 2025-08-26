@@ -9,10 +9,12 @@ import com.treetalk.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
-@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -31,6 +33,7 @@ public class UserService {
         this.jwtUtil = jwtUtil;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public UserDto.LoginResponse register(UserDto.RegisterRequest request) {
         // 检查邮箱是否已存在
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -54,6 +57,7 @@ public class UserService {
         return convertToResponse(user);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
     public String login(UserDto.LoginRequest request) {
         User user = userRepository.findByEmailOrPhone(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
@@ -62,13 +66,21 @@ public class UserService {
             throw new RuntimeException("密码错误");
         }
 
-        // 更新最后登录时间
-        user.setLastLoginTime(java.time.LocalDateTime.now());
-        userRepository.save(user);
-
+        // 更新最后登录时间需要写操作，单独处理
+        updateLastLoginTime(user.getId());
+        
         return jwtUtil.generateToken(user.getId().toString());
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateLastLoginTime(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("用户不存在"));
+        user.setLastLoginTime(java.time.LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
     public UserDto.LoginResponse getUserById(Long userId) {
         User user = userRepository.findActiveUserById(userId)
                 .orElseThrow(() -> new RuntimeException("用户不存在"));

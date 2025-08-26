@@ -1,16 +1,18 @@
 package com.treetalk.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     private boolean success;
+    private Integer code = 200;
     private String message;
     private T data;
     private LocalDateTime timestamp;
-    private String path;
 
     public ApiResponse() {
         this.timestamp = LocalDateTime.now();
@@ -22,8 +24,20 @@ public class ApiResponse<T> {
         this.message = message;
     }
 
+    public ApiResponse(boolean success, Integer code, String message) {
+        this();
+        this.success = success;
+        this.code = code;
+        this.message = message;
+    }
+
     public ApiResponse(boolean success, String message, T data) {
         this(success, message);
+        this.data = data;
+    }
+
+    public ApiResponse(boolean success, Integer code, String message, T data) {
+        this(success, code, message);
         this.data = data;
     }
 
@@ -44,47 +58,7 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> error(String message, T data) {
-        return new ApiResponse<>(false, message, data);
+        return new ApiResponse<>(false, 500, message, data);
     }
 
-    // Getters and Setters
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
 }

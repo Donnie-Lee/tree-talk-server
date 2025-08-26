@@ -1,8 +1,10 @@
 package com.treetalk.dto;
 
+import com.treetalk.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
@@ -155,5 +157,22 @@ public class UserDto {
         public void setToken(String token) {
             this.token = token;
         }
+    }
+
+    @Data
+    public static class UserProfileResponse {
+        private Long id;
+        private Long userId;
+        private String userEmail;
+        private String userNickname;
+        private String userAvatarUrl;
+        private Integer continuousCheckInDays;
+        private Integer totalCheckInDays;
+        private Integer totalMeditationMinutes;
+        private Integer totalChatCount;
+        private Integer privacySetting;
+        private LocalDateTime createdTime;
+        private LocalDateTime updatedTime;
+
     }
 }

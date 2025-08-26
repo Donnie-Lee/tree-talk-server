@@ -52,6 +52,8 @@ public class ChatDto {
 
     public static class SessionResponse {
         private Long id;
+        private Long userId;
+        private String userNickname;
         private String aiName;
         private String sessionTitle;
         private LocalDateTime startTime;
@@ -65,6 +67,22 @@ public class ChatDto {
 
         public void setId(Long id) {
             this.id = id;
+        }
+
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public String getUserNickname() {
+            return userNickname;
+        }
+
+        public void setUserNickname(String userNickname) {
+            this.userNickname = userNickname;
         }
 
         public String getAiName() {

@@ -11,6 +11,8 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
+import java.util.List;
 
 @Configuration
 @EnableKnife4j
@@ -30,13 +32,14 @@ public class Knife4jConfig {
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
-                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
-                .components(new Components()
-                        .addSecuritySchemes("Bearer Authentication",
-                                new SecurityScheme()
-                                        .name("Bearer Authentication")
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")));
+//                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+//                .components(new Components()
+//                        .addSecuritySchemes("Bearer Authentication",
+//                                new SecurityScheme()
+//                                        .name("Authorization")
+//                                        .type(SecurityScheme.Type.HTTP)
+//                                        .scheme("bearer")
+//                                        .bearerFormat("JWT")))
+                .servers(List.of(new Server().url("/api")));
     }
 }

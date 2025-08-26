@@ -7,6 +7,7 @@ import com.treetalk.repository.EmotionRecordRepository;
 import com.treetalk.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class EmotionRecordService {
 
     private final EmotionRecordRepository emotionRecordRepository;
@@ -28,6 +28,7 @@ public class EmotionRecordService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public EmotionRecordDto.Response createEmotionRecord(Long userId, EmotionRecordDto.CreateRequest request) {
         User user = userRepository.findActiveUserById(userId)
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
