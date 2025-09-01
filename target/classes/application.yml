@@ -1,7 +1,6 @@
 spring:
   application:
     name: tree-hole-server
-  
   # PostgreSQL配置
   datasource:
     url: jdbc:postgresql://localhost:5432/treetalk

@@ -23,12 +23,11 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generateToken(String subject) {
+    public String generateToken(Object subject) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
-
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(GsonUtils.toJson(subject))
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

@@ -1,5 +1,7 @@
 package com.treetalk.security;
 
+import com.treetalk.model.entity.Account;
+import com.treetalk.util.GsonUtils;
 import com.treetalk.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,26 +34,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         String authorizationHeader = request.getHeader("Authorization");
         String token = null;
-        String userId = null;
+        String userJson = null;
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             token = authorizationHeader.substring(7);
             try {
-                userId = jwtUtil.getSubjectFromToken(token);
+                userJson = jwtUtil.getSubjectFromToken(token);
             } catch (Exception e) {
                 // Token解析失败，继续过滤链
             }
         }
 
-        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (userJson != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtUtil.validateToken(token)) {
+                Account account = GsonUtils.fromJson(userJson, Account.class);
                 UsernamePasswordAuthenticationToken authToken = 
-                    new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
+                    new UsernamePasswordAuthenticationToken(account, null, new ArrayList<>());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                
-                // 将userId添加到request属性中，供控制器使用
-                request.setAttribute("userId", Long.parseLong(userId));
             }
         }
 

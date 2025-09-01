@@ -1,6 +1,6 @@
 package com.treetalk.util;
 
-import com.treetalk.entity.User;
+import com.treetalk.model.entity.Account;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,20 +21,20 @@ public class SecurityUserUtils {
      */
     public static Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && 
-            !"anonymousUser".equals(authentication.getPrincipal())) {
+        if (authentication != null && authentication.isAuthenticated() &&
+                !"anonymousUser".equals(authentication.getPrincipal())) {
             Object principal = authentication.getPrincipal();
             if (principal instanceof String) {
                 try {
                     return Long.parseLong((String) principal);
                 } catch (NumberFormatException e) {
-                    return null;
+                    throw new RuntimeException("用户信息解析异常");
                 }
-            } else if (principal instanceof User) {
-                return ((User) principal).getId();
+            } else if (principal instanceof Account) {
+                return ((Account) principal).getId();
             }
         }
-        return null;
+        throw new RuntimeException("获取当前用户异常");
     }
 
     /**
@@ -42,15 +42,13 @@ public class SecurityUserUtils {
      *
      * @return 用户名，如果未登录则返回null
      */
-    public static String getCurrentUsername() {
+    public static Account getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() &&
-            !"anonymousUser".equals(authentication.getPrincipal())) {
+                !"anonymousUser".equals(authentication.getPrincipal())) {
             Object principal = authentication.getPrincipal();
-            if (principal instanceof String) {
-                return (String) principal;
-            } else if (principal instanceof User) {
-                return ((User) principal).getEmail();
+            if (principal instanceof Account) {
+                return ((Account) principal);
             }
         }
         return null;
@@ -63,8 +61,8 @@ public class SecurityUserUtils {
      */
     public static boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && authentication.isAuthenticated() && 
-               !"anonymousUser".equals(authentication.getPrincipal());
+        return authentication != null && authentication.isAuthenticated() &&
+                !"anonymousUser".equals(authentication.getPrincipal());
     }
 
     /**

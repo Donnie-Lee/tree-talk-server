@@ -1,12 +1,12 @@
 package com.treetalk.repository;
 
-import com.treetalk.model.entity.ChatSession;
+import com.treetalk.model.entity.TreeHole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ChatSessionRepository extends JpaRepository<ChatSession, Long> {
-    List<ChatSession> findByAccountId(Long accountId);
+public interface TreeHoleRepository extends JpaRepository<TreeHole, Long> {
+    List<TreeHole> findByAccountId(Long accountId);
 }
