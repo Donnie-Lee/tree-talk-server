@@ -25,6 +25,9 @@ public class AccountProfileInfo {
     @Column(name = "username")
     private String username;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @Column(name = "nickname", length = 50)
     private String nickname;
 
